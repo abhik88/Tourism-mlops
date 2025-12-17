@@ -24,17 +24,22 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Install Dependencies
-        run: pip install pandas datasets scikit-learn huggingface_hub
+        run: pip install pandas datasets scikit-learn huggingface_hub joblib
       - name: Run Data Preparation
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: python src/data_prep.py
-      # We upload the clean data as an artifact so the next job can see it
+      # Upload both the clean data and encoders as artifacts
       - name: Upload Clean Data Artifact
         uses: actions/upload-artifact@v4
         with:
           name: clean-data
           path: data/tourism_cleaned.csv
+      - name: Upload Encoders Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: encoders
+          path: data/encoders.joblib
 
   model-training:
     needs: data-prep
@@ -45,6 +50,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: clean-data
+          path: data
+      - name: Download Encoders Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: encoders
           path: data
       - name: Install Dependencies
         run: pip install pandas scikit-learn joblib huggingface_hub matplotlib seaborn

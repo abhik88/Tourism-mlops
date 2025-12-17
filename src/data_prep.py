@@ -50,7 +50,13 @@ processed_data_path = 'data/tourism_cleaned.csv'
 df.to_csv(processed_data_path, index=False)
 print(f"✅ Cleaned and encoded data saved to {processed_data_path}")
 
-# Save encoders
+# Save encoders in data directory
 encoders_path = 'data/encoders.joblib'
 joblib.dump(encoders, encoders_path)
 print(f"✅ Encoders saved to {encoders_path}")
+
+# Also save encoders in model_dir for easy access by training script
+os.makedirs('model_dir', exist_ok=True)
+encoders_model_path = 'model_dir/encoders.joblib'
+joblib.dump(encoders, encoders_model_path)
+print(f"✅ Encoders also saved to {encoders_model_path}")

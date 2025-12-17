@@ -75,19 +75,19 @@ with col3:
     typeof_contact_options = ['Company Invited', 'Self Inquiry', 'Unknown']
     typeof_contact = st.selectbox("Type of Contact", typeof_contact_options)
 
-    occupation_options = ['Salaried', 'Small Business', 'Large Business', 'Free Lancer', 'Student', 'Unemployed'] 
+    occupation_options = ['Salaried', 'Small Business', 'Large Business', 'Free Lancer', 'Student', 'Unemployed']
     occupation = st.selectbox("Occupation", occupation_options)
 
-    gender_options = ['Male', 'Female', 'Fe Male'] 
+    gender_options = ['Male', 'Female', 'Fe Male']
     gender = st.selectbox("Gender", gender_options)
 
-    product_pitched_options = ['Basic', 'Deluxe', 'Standard', 'Super Deluxe', 'King'] 
+    product_pitched_options = ['Basic', 'Deluxe', 'Standard', 'Super Deluxe', 'King']
     product_pitched = st.selectbox("Product Pitched", product_pitched_options)
 
-    marital_status_options = ['Married', 'Single', 'Divorced'] 
+    marital_status_options = ['Married', 'Single', 'Divorced']
     marital_status = st.selectbox("Marital Status", marital_status_options)
 
-    designation_options = ['Executive', 'Manager', 'Senior Manager', 'AVP', 'VP'] 
+    designation_options = ['Executive', 'Manager', 'Senior Manager', 'AVP', 'VP']
     designation = st.selectbox("Designation", designation_options)
 
 # --- Prediction Logic ---
@@ -118,14 +118,19 @@ if st.button("Predict Purchase Likelihood"):
     transformed_inputs = raw_inputs.copy()
     for col, le in encoders.items():
         if col in transformed_inputs:
-            # Convert to string for LabelEncoder, which expects string inputs usually
+            # Convert to string for LabelEncoder
             input_val = str(transformed_inputs[col])
-            # Handle potential unseen labels by trying to transform, else assign a default/handle error
-            if input_val in le.classes_:
-                transformed_inputs[col] = le.transform([input_val])[0]
-            else:
-                st.warning(f"Warning: Unseen category '{input_val}' for feature '{col}'. Assigning -1.")
-                transformed_inputs[col] = -1 # A common way to handle unseen categories
+            # Handle potential unseen labels gracefully
+            try:
+                if input_val in le.classes_:
+                    transformed_inputs[col] = le.transform([input_val])[0]
+                else:
+                    # Use the first class as default for unseen categories
+                    st.warning(f"Warning: Unseen category '{input_val}' for feature '{col}'. Using default encoding.")
+                    transformed_inputs[col] = 0
+            except Exception as e:
+                st.warning(f"Warning: Error encoding '{col}': {e}. Using default value 0.")
+                transformed_inputs[col] = 0
 
     # Create DataFrame for prediction, ensuring correct order
     df_input = pd.DataFrame([transformed_inputs], columns=feature_names)
