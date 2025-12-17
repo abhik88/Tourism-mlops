@@ -18,10 +18,9 @@ st.set_page_config(page_title="Wellness Tourism Package Predictor", layout="wide
 st.title("🗺️ Wellness Tourism Package Prediction")
 st.markdown("Enter customer details to predict the likelihood of purchasing the Wellness Tourism Package.")
 
-# Add startup indicator
-with st.spinner("🔄 Loading prediction model..."):
-    print(f"[STARTUP] App starting up...", file=sys.stderr)
-    print(f"[STARTUP] Attempting to load from repo: {model_repo_id}", file=sys.stderr)
+# Add loading message
+print(f"[STARTUP] App starting up...", file=sys.stderr)
+print(f"[STARTUP] Attempting to load from repo: {model_repo_id}", file=sys.stderr)
 
 @st.cache_resource
 def load_artifacts_from_hub():
@@ -50,7 +49,9 @@ def load_artifacts_from_hub():
         st.code(traceback_msg, language="python")
         return None, None
 
-model, encoders = load_artifacts_from_hub()
+# Load artifacts with a status message
+with st.spinner("🔄 Loading prediction model..."):
+    model, encoders = load_artifacts_from_hub()
 
 if model and encoders:
     st.success("✅ Prediction System Activated: Model and Encoders Loaded")
