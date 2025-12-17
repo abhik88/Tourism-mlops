@@ -15,6 +15,8 @@ model_filename = "best_model.joblib"
 
 # --- Setup ---
 st.set_page_config(page_title="Wellness Tourism Package Predictor", layout="wide")
+
+# Show title immediately so page isn't blank
 st.title("🗺️ Wellness Tourism Package Prediction")
 st.markdown("Enter customer details to predict the likelihood of purchasing the Wellness Tourism Package.")
 
@@ -40,29 +42,33 @@ def load_artifacts_from_hub():
         traceback_msg = traceback.format_exc()
         print(f"[ERROR] {error_msg}", file=sys.stderr)
         print(f"[ERROR] Traceback: {traceback_msg}", file=sys.stderr)
-        st.error(f"❌ {error_msg}")
-        st.info("🔍 Ensure the model and encoders are pushed to Hugging Face Hub correctly.")
-        st.code(traceback_msg, language="python")
         return None, None
 
 # Load artifacts - the decorator handles the spinner
 model, encoders = load_artifacts_from_hub()
 
-if model and encoders:
-    st.success("✅ Prediction System Activated: Model and Encoders Loaded")
-    print(f"[SUCCESS] All artifacts loaded. App ready!", file=sys.stderr)
-else:
-    st.warning("⚠️ App Running in Demo Mode - Model Not Loaded")
-    st.info('''**Possible Issues:**
+if not model or not encoders:
+    st.error("❌ Failed to load model or encoders from Hugging Face Hub")
+    st.warning("⚠️ Model Loading Failed - Cannot Make Predictions")
+    
+    with st.expander("🔍 Troubleshooting Information", expanded=True):
+        st.info(f'''**Possible Issues:**
 1. Model repository might not exist: `{model_repo_id}`
 2. Model files (best_model.joblib, encoders.joblib) not uploaded
 3. Repository might be private and needs authentication
+4. Network connectivity issues
 
 **To fix:**
 - Ensure the model training pipeline has run successfully
 - Verify files exist at: https://huggingface.co/{model_repo_id}
+- Check if the repository is public or properly authenticated
 ''')
+        st.markdown(f"**Expected Model Repository:** `{model_repo_id}`")
+        st.markdown(f"**Check here:** https://huggingface.co/{model_repo_id}")
     st.stop()
+
+st.success("✅ Prediction System Activated: Model and Encoders Loaded")
+print(f"[SUCCESS] All artifacts loaded. App ready!", file=sys.stderr)
 
 # Define feature names in the exact order the model expects
 feature_names = [

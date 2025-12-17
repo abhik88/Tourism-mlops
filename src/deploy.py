@@ -24,11 +24,11 @@ commit_msg = f"CI/CD Deployment: Updated app at {timestamp}"
 print(f"🚀 Deploying to {space_id}...")
 try:
     api.create_repo(repo_id=space_id, repo_type="space", space_sdk="docker", exist_ok=True)
-    
+
     # Upload with commit message that includes timestamp to force update
     api.upload_folder(
-        folder_path=deploy_folder, 
-        repo_id=space_id, 
+        folder_path=deploy_folder,
+        repo_id=space_id,
         repo_type="space",
         commit_message=commit_msg,
         delete_patterns=["*.py", "*.toml", "*.txt", "*.md", "Dockerfile"]  # Delete old files first
