@@ -4,6 +4,8 @@ import pandas as pd
 import joblib
 import numpy as np
 from huggingface_hub import hf_hub_download
+import sys
+import traceback
 
 # Configuration
 hf_username = "Abhik19"
@@ -16,27 +18,55 @@ st.set_page_config(page_title="Wellness Tourism Package Predictor", layout="wide
 st.title("🗺️ Wellness Tourism Package Prediction")
 st.markdown("Enter customer details to predict the likelihood of purchasing the Wellness Tourism Package.")
 
+# Add startup indicator
+with st.spinner("🔄 Loading prediction model..."):
+    print(f"[STARTUP] App starting up...", file=sys.stderr)
+    print(f"[STARTUP] Attempting to load from repo: {model_repo_id}", file=sys.stderr)
+
 @st.cache_resource
 def load_artifacts_from_hub():
+    print(f"[LOAD] Starting artifact loading...", file=sys.stderr)
     try:
+        print(f"[LOAD] Downloading model from {model_repo_id}...", file=sys.stderr)
         model_path = hf_hub_download(repo_id=model_repo_id, filename=model_filename)
+        print(f"[LOAD] Model downloaded to: {model_path}", file=sys.stderr)
         model = joblib.load(model_path)
+        print(f"[LOAD] Model loaded successfully!", file=sys.stderr)
 
+        print(f"[LOAD] Downloading encoders from {model_repo_id}...", file=sys.stderr)
         encoders_path = hf_hub_download(repo_id=model_repo_id, filename=encoders_filename)
+        print(f"[LOAD] Encoders downloaded to: {encoders_path}", file=sys.stderr)
         encoders = joblib.load(encoders_path)
+        print(f"[LOAD] Encoders loaded successfully!", file=sys.stderr)
 
         return model, encoders
     except Exception as e:
-        st.error(f"Failed to load model or encoders: {e}")
-        st.info("Ensure the model and encoders are pushed to Hugging Face Hub correctly.")
+        error_msg = f"Failed to load model or encoders: {str(e)}"
+        traceback_msg = traceback.format_exc()
+        print(f"[ERROR] {error_msg}", file=sys.stderr)
+        print(f"[ERROR] Traceback: {traceback_msg}", file=sys.stderr)
+        st.error(f"❌ {error_msg}")
+        st.info("🔍 Ensure the model and encoders are pushed to Hugging Face Hub correctly.")
+        st.code(traceback_msg, language="python")
         return None, None
 
 model, encoders = load_artifacts_from_hub()
 
 if model and encoders:
     st.success("✅ Prediction System Activated: Model and Encoders Loaded")
+    print(f"[SUCCESS] All artifacts loaded. App ready!", file=sys.stderr)
 else:
-    st.stop() # Stop the app if artifacts couldn't be loaded
+    st.warning("⚠️ App Running in Demo Mode - Model Not Loaded")
+    st.info('''**Possible Issues:**
+1. Model repository might not exist: `{model_repo_id}`
+2. Model files (best_model.joblib, encoders.joblib) not uploaded
+3. Repository might be private and needs authentication
+
+**To fix:**
+- Ensure the model training pipeline has run successfully
+- Verify files exist at: https://huggingface.co/{model_repo_id}
+''')
+    st.stop()
 
 # Define feature names in the exact order the model expects
 # This order is derived from X = df.drop(['ProdTaken', 'CustomerID'], axis=1).columns
