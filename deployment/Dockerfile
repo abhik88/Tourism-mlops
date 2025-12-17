@@ -30,5 +30,8 @@ ENV HOME=/home/user \
 # Expose port 7860 for Hugging Face Spaces
 EXPOSE 7860
 
+# Health check to ensure Streamlit is running
+HEALTHCHECK CMD curl --fail http://localhost:7860/_stcore/health || exit 1
+
 # Define the command to run the Streamlit app
-CMD ["streamlit", "run", "app.py", "--server.port=7860", "--server.address=0.0.0.0"]
+CMD ["streamlit", "run", "app.py", "--server.port=7860", "--server.address=0.0.0.0", "--server.headless=true"]
