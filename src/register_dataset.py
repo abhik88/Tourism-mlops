@@ -21,14 +21,13 @@ else:
     exit(1)
 
 # 2. PATH DEBUGGING & LOADING
-current_dir = os.getcwd()
 file_path = 'data/tourism.csv'
 
 if os.path.exists(file_path):
     print(f"✅ Found file at: {file_path}")
     df = pd.read_csv(file_path)
 else:
-    print(f"⚠️ File not found. Creating MOCK data.")
+    print(f"⚠️ File not found at {file_path}. Creating MOCK data for demonstration.")
     data = {'Age': [25, 30, 35], 'MonthlyIncome': [20000, 30000, 40000], 'ProdTaken': [0, 1, 0]}
     df = pd.DataFrame(data)
 
