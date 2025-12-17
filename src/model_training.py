@@ -39,7 +39,7 @@ joblib.dump(encoders, 'model_dir/encoders.joblib')
 # Push to HF
 api = HfApi()
 # ⚠️ CHANGED: 'abhik88' -> 'Abhik19'
-repo_id = "Abhik19/tourism-prediction-model" 
+repo_id = "Abhik19/tourism-prediction-model"
 
 print(f"🚀 Pushing model to {repo_id}...")
 api.create_repo(repo_id=repo_id, exist_ok=True)

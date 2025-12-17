@@ -32,34 +32,34 @@ passport = st.selectbox("Has Passport?", [0, 1])
 # 3. PREDICTION LOGIC
 if st.button("Predict"):
     # Fix: Set vector size to 19 to match model expectation (includes Unnamed: 0)
-    input_data = [0] * 19 
-    
+    input_data = [0] * 19
+
     # Mapping based on typical Pandas Column order after 'Unnamed: 0' inclusion:
     # 0: Unnamed: 0
     # 1: Age
     # 4: DurationOfPitch
     # 13: Passport
     # 18: MonthlyIncome
-    
+
     input_data[1] = age          # Age
     input_data[18] = income      # MonthlyIncome
     input_data[4] = pitch        # DurationOfPitch
     input_data[13] = passport    # Passport
-    
+
     # Create DataFrame
     df_input = pd.DataFrame([input_data])
-    
+
     # Predict
     try:
         prediction = model.predict(df_input)[0]
         probability = model.predict_proba(df_input)[0][1]
-        
+
         st.divider()
         if prediction == 1:
             st.success(f"### Prediction: Will Purchase (Prob: {probability:.2f})")
         else:
             st.warning(f"### Prediction: No Purchase (Prob: {probability:.2f})")
-            
+
     except ValueError as e:
         st.error(f"Shape Error: {e}")
         st.info("Debug Info: Input shape is " + str(df_input.shape))
