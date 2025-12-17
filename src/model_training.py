@@ -26,7 +26,11 @@ except Exception as e:
     print(f"❌ Failed to load tourism_cleaned.csv: {e}")
     print("⚠️ Creating MOCK data for demonstration.")
     # Replicate the structure of the processed data as much as possible for the fallback
-    df = pd.DataFrame({'Unnamed: 0':[0,1,2], 'CustomerID':[200000, 200001, 200002], 'ProdTaken':[0,1,0], 'Age':[25,30,35], 'TypeofContact':[0,1,0], 'CityTier':[1,2,3], 'DurationOfPitch':[10,15,20], 'Occupation':[0,1,2], 'Gender':[0,1,0], 'NumberOfPersonVisiting':[1,2,1], 'ProductPitched':[0,1,0], 'PreferredPropertyStar':[3,4,3], 'MaritalStatus':[0,1,0], 'NumberOfTrips':[1,2,1], 'Passport':[0,1,0], 'PitchSatisfactionScore':[3,4,3], 'OwnCar':[0,1,0], 'NumberOfChildrenVisiting':[0,1,0], 'Designation':[0,1,2], 'MonthlyIncome':[20000,30000,40000]}))
+    df = pd.DataFrame({   'Unnamed: 0':[0,1,2], 'CustomerID':[200000, 200001, 200002], 'ProdTaken':[0,1,0], 'Age':[25,30,35], 
+    'TypeofContact':[0,1,0], 'CityTier':[1,2,3], 'DurationOfPitch':[10,15,20], 'Occupation':[0,1,2], 
+    'Gender':[0,1,0], 'NumberOfPersonVisiting':[1,2,1], 'ProductPitched':[0,1,0], 'PreferredPropertyStar':[3,4,3], 
+    'MaritalStatus':[0,1,0], 'NumberOfTrips':[1,2,1], 'Passport':[0,1,0], 'PitchSatisfactionScore':[3,4,3], 
+    'OwnCar':[0,1,0], 'NumberOfChildrenVisiting':[0,1,0], 'Designation':[0,1,2], 'MonthlyIncome':[20000,30000,40000]})
 
 # Load Encoders
 try:

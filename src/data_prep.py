@@ -17,7 +17,11 @@ try:
 except Exception as e:
     print(f"❌ Failed to load dataset from HF: {e}")
     print("⚠️ Creating MOCK data for demonstration.")
-    df = pd.DataFrame({'Age': [25, 30, 35], 'MonthlyIncome': [20000, 30000, 40000], 'ProdTaken': [0, 1, 0], 'TypeofContact':['Company Invited', 'Self Inquiry', 'Unknown'], 'DurationOfPitch': [10.0, 15.0, 20.0], 'Occupation':['Salaried', 'Freelancer', 'Student'], 'Gender':['Male', 'Female', 'Fe Male'], 'ProductPitched':['Basic', 'Deluxe', 'Standard'], 'MaritalStatus':['Married', 'Single', 'Divorced'], 'Designation':['Executive', 'Manager', 'VP']}))
+    df = pd.DataFrame({   'Age': [25, 30, 35], 'MonthlyIncome': [20000, 30000, 40000], 'ProdTaken': [0, 1, 0], 
+    'TypeofContact':['Company Invited', 'Self Inquiry', 'Unknown'], 'DurationOfPitch': [10.0, 15.0, 20.0], 
+    'Occupation':['Salaried', 'Freelancer', 'Student'], 'Gender':['Male', 'Female', 'Fe Male'], 
+    'ProductPitched':['Basic', 'Deluxe', 'Standard'], 'MaritalStatus':['Married', 'Single', 'Divorced'], 
+    'Designation':['Executive', 'Manager', 'VP']})
 
 # 1. Data Cleaning: Filling missing values
 print("⚙️ Cleaning data...")
