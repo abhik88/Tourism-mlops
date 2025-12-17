@@ -18,11 +18,7 @@ st.set_page_config(page_title="Wellness Tourism Package Predictor", layout="wide
 st.title("🗺️ Wellness Tourism Package Prediction")
 st.markdown("Enter customer details to predict the likelihood of purchasing the Wellness Tourism Package.")
 
-# Add loading message
-print(f"[STARTUP] App starting up...", file=sys.stderr)
-print(f"[STARTUP] Attempting to load from repo: {model_repo_id}", file=sys.stderr)
-
-@st.cache_resource
+@st.cache_resource(show_spinner="🔄 Loading prediction model from Hugging Face...")
 def load_artifacts_from_hub():
     print(f"[LOAD] Starting artifact loading...", file=sys.stderr)
     try:
@@ -49,9 +45,8 @@ def load_artifacts_from_hub():
         st.code(traceback_msg, language="python")
         return None, None
 
-# Load artifacts with a status message
-with st.spinner("🔄 Loading prediction model..."):
-    model, encoders = load_artifacts_from_hub()
+# Load artifacts - the decorator handles the spinner
+model, encoders = load_artifacts_from_hub()
 
 if model and encoders:
     st.success("✅ Prediction System Activated: Model and Encoders Loaded")
@@ -70,7 +65,6 @@ else:
     st.stop()
 
 # Define feature names in the exact order the model expects
-# This order is derived from X = df.drop(['ProdTaken', 'CustomerID'], axis=1).columns
 feature_names = [
     'Unnamed: 0', 'Age', 'TypeofContact', 'CityTier', 'DurationOfPitch',
     'Occupation', 'Gender', 'NumberOfPersonVisiting', 'ProductPitched',
@@ -90,19 +84,16 @@ with col1:
     number_of_person_visiting = st.slider("Number of People Visiting", 1, 10, 1)
     number_of_trips = st.slider("NumberOfTrips Annually", 0, 20, 2)
     number_of_children_visiting = st.slider("Number of Children Visiting (under 5)", 0, 5, 0)
-    own_car = st.selectbox("Owns a Car?", options=[0, 1], format_func=lambda x: "Yes" if x == 1 else "No") # Store 0/1
+    own_car = st.selectbox("Owns a Car?", options=[0, 1], format_func=lambda x: "Yes" if x == 1 else "No")
 
 with col2:
     duration_of_pitch = st.slider("Duration of Pitch (minutes)", 5, 60, 15)
     pitch_satisfaction_score = st.slider("Pitch Satisfaction Score (1-5)", 1, 5, 3)
     preferred_property_star = st.slider("Preferred Property Star (1-5)", 1, 5, 3)
-    passport = st.selectbox("Has a Passport?", options=[0, 1], format_func=lambda x: "Yes" if x == 1 else "No") # Store 0/1
+    passport = st.selectbox("Has a Passport?", options=[0, 1], format_func=lambda x: "Yes" if x == 1 else "No")
     city_tier = st.selectbox("City Tier", [1, 2, 3])
 
 with col3:
-    # Categorical features requiring encoding - use the categories seen during training
-    # These options should ideally come from `le.classes_` from the loaded encoders
-    # For now, hardcode based on common sense/data description
     typeof_contact_options = ['Company Invited', 'Self Inquiry', 'Unknown']
     typeof_contact = st.selectbox("Type of Contact", typeof_contact_options)
 
@@ -125,7 +116,7 @@ with col3:
 if st.button("Predict Purchase Likelihood"):
     # Create a dictionary for raw inputs
     raw_inputs = {
-        'Unnamed: 0': 0, # This was likely an index column, setting to 0 for prediction
+        'Unnamed: 0': 0,
         'Age': age,
         'TypeofContact': typeof_contact,
         'CityTier': city_tier,
@@ -149,26 +140,23 @@ if st.button("Predict Purchase Likelihood"):
     transformed_inputs = raw_inputs.copy()
     for col, le in encoders.items():
         if col in transformed_inputs:
-            # Convert to string for LabelEncoder
             input_val = str(transformed_inputs[col])
-            # Handle potential unseen labels gracefully
             try:
                 if input_val in le.classes_:
                     transformed_inputs[col] = le.transform([input_val])[0]
                 else:
-                    # Use the first class as default for unseen categories
                     st.warning(f"Warning: Unseen category '{input_val}' for feature '{col}'. Using default encoding.")
                     transformed_inputs[col] = 0
             except Exception as e:
                 st.warning(f"Warning: Error encoding '{col}': {e}. Using default value 0.")
                 transformed_inputs[col] = 0
 
-    # Create DataFrame for prediction, ensuring correct order
+    # Create DataFrame for prediction
     df_input = pd.DataFrame([transformed_inputs], columns=feature_names)
 
     try:
         prediction = model.predict(df_input)[0]
-        probability = model.predict_proba(df_input)[0][1] # Probability of '1' (purchase)
+        probability = model.predict_proba(df_input)[0][1]
 
         st.divider()
         st.subheader("Prediction Results")
@@ -185,4 +173,4 @@ if st.button("Predict Purchase Likelihood"):
     except ValueError as e:
         st.error(f"Prediction Error: {e}")
         st.info("Debug Info: Input shape is " + str(df_input.shape))
-        st.dataframe(df_input) # Show the malformed input DataFrame for debugging
+        st.dataframe(df_input)
